@@ -9,6 +9,7 @@ from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
 from .models import Player, Team, Invitation, User, Coach, InviteLink
 from django.utils.timezone import now, timedelta
+from django.shortcuts import get_object_or_404
 
 def route(request):
     data = {
@@ -153,3 +154,20 @@ def get_current_user(request):
     except Exception as e:
         return Response({'error': str(e)}, status=500)
     
+
+@api_view(['GET'])
+@permission_classes([permissions.IsAuthenticated])
+def get_player_profile(request):
+    try:
+        # Ensure the logged-in user has a player profile
+        player = get_object_or_404(Player, name=request.user)
+        serializer = PlayerSerializer(player, context={'request': request})
+        return Response({
+            'success': True,
+            'data': serializer.data
+        }, status=200)
+    except Player.DoesNotExist:
+        return Response({
+            'success': False,
+            'error': 'Player profile not found.'
+        }, status=404)

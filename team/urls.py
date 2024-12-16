@@ -1,5 +1,5 @@
 from django.urls import path, include
-from .views import route, RegisterView, ProtectedView, TeamView, PlayerView, create_invite, register_coach, GenerateInviteLinkView, accept_invite, get_current_user
+from .views import route, RegisterView, ProtectedView, TeamView, PlayerView, create_invite, register_coach, GenerateInviteLinkView, accept_invite, get_current_user, get_player_profile
 
 from rest_framework.routers import DefaultRouter
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView, TokenVerifyView
@@ -22,5 +22,6 @@ urlpatterns = [
     path('register/<uuid:token>/', register_coach, name='register_coach'),
     path('generate-invite/<int:team_id>/', GenerateInviteLinkView.as_view(), name='generate_invite'),
     path('invite/<uuid:token>/', accept_invite, name='accept_invite'),
-    path('user_me/', get_current_user, name="current_user")
+    path('user_me/', get_current_user, name="current_user"),
+    path('player_profile/', get_player_profile, name="player_profile")
 ]

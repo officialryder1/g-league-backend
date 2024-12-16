@@ -3,11 +3,12 @@ from django.http import JsonResponse
 from django.contrib.auth import get_user_model
 from .serializers import UserSerializer, PlayerSerializer, TeamSerializer
 from rest_framework.response import Response
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, permission_classes
 from rest_framework import generics, permissions, viewsets
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
-from .models import Player, Team, Invitation, User, Coach
+from .models import Player, Team, Invitation, User, Coach, InviteLink
+from django.utils.timezone import now, timedelta
 
 def route(request):
     data = {
@@ -82,3 +83,73 @@ def register_coach(request, token):
         return Response({"message": "Registration successful"}, status=201)
     except Invitation.DoesNotExist:
         return Response({"error": "Invalid or expired token."}, status=400)
+    
+class GenerateInviteLinkView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def post(self, request, team_id):
+        try:
+            user_id = request.user.id
+            team = Team.objects.get(id=team_id)
+            coach = Coach.objects.get(id=user_id)
+
+            # user = User.objects.get(id=user_id)
+            # Check if the user is a coach of the team
+            if not coach.team == request.user:
+                return Response({"error": "You are not the coach of this team"}, status=403)
+            
+            # Create invite link
+
+            invite = InviteLink.objects.create(team=team, created_by=request.user, expires_at=now() + timedelta(days=5))
+
+            invite_url = f"{request.build_absolute_uri('/api/invite/')}{invite.token}/"
+            return Response({"invite_link": invite_url}, status=201)
+        
+        except Team.DoesNotExist:
+            return Response({"error": "Team not found"}, status=404)
+        
+@api_view(['POST'])
+@permission_classes([permissions.IsAuthenticated])
+def accept_invite(request, token):
+    try:
+        invite = InviteLink.objects.get(token=token, is_active = True)
+
+        # check if the is expired
+        if invite.expires_at < now():
+            return Response({"error": "Invite link has expired"}, status=400)
+        
+        # create the team player
+        user = request.user
+        if user.role != "player":
+            return Response({"error": "Only players can accept team invites"}, status=400)
+        
+        if hasattr(user, 'player'):
+            player = user.player
+        else:
+            player = Player(name=user)
+
+        player.team = invite.team
+        player.save()
+
+        # Deactivate the invite link after use
+        invite.is_active = False
+        invite.save()
+
+        return Response({"success": "You have successfully joined the team"}, status=200)
+    except InviteLink.DoesNotExist:
+        return Response({"error": "Invalid invite link"}, status=404)
+
+    except Exception as e:
+        return Response({"error": str(e)}, status=500)
+    
+
+@api_view(['GET'])
+@permission_classes([permissions.IsAuthenticated])
+def get_current_user(request):
+    try:
+        user = request.user
+        serializer = UserSerializer(user)
+        return Response(serializer.data, status=200)
+    except Exception as e:
+        return Response({'error': str(e)}, status=500)
+    

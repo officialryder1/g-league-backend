@@ -91,10 +91,10 @@ WSGI_APPLICATION = 'main.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
-DATABASES = {}
+DEVELOPMENT_COMMANDS = {'runserver', 'shell', 'migrate', 'makemigrations', 'test', 'createsuperuser'}
 
-if 'runserver' in sys.argv or 'shell' in sys.argv:
-
+# Database Configuration
+if set(sys.argv) & DEVELOPMENT_COMMANDS:
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.sqlite3',
@@ -102,10 +102,13 @@ if 'runserver' in sys.argv or 'shell' in sys.argv:
         }
     }
 else:
-    DATABASES['default'] = dj_database_url.parse(config("POSTGRES"))
+    DATABASES = {
+        'default': dj_database_url.parse(config("POSTGRES"))
+    }
+
+# Enable S3 Storage in production
+if 'runserver' not in sys.argv and 'shell' not in sys.argv:
     DEFAULT_FILE_STORAGE = "storages.backends.s3boto3.S3Boto3Storage"
-
-
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
 
@@ -162,8 +165,10 @@ AUTH_USER_MODEL = 'team.User'
 CORS_ALLOW_CREDENTIALS = True
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",  # Your frontend URL
+    "https://g-league.vercel.app"
 ]
 
 CSRF_TRUSTED_ORIGINS = [
     "http://localhost:5173",  # Your frontend URL
+    "https://g-league.vercel.app"
 ]

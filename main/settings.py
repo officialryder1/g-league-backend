@@ -29,7 +29,7 @@ SECRET_KEY = 'django-insecure-8*)zldia=s&jnq9wqe_!y$sa0g^yg1chb%35e8loby6#@_j%(p
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = ['https://g-league.vercel.app', "http://localhost:5173"]
 
 
 # Application definition

@@ -15,6 +15,7 @@ import os
 import sys
 import dj_database_url
 from decouple import config
+from datetime import timedelta
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -27,7 +28,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-8*)zldia=s&jnq9wqe_!y$sa0g^yg1chb%35e8loby6#@_j%(p'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = ['*']
 
@@ -103,7 +104,8 @@ if set(sys.argv) & DEVELOPMENT_COMMANDS:
     }
 else:
     DATABASES = {
-        'default': dj_database_url.parse(config("POSTGRES"))
+        'default': dj_database_url.parse(default=config("POSTGRES"), conn_max_age=600,
+        ssl_require=True)
     }
 
 # Enable S3 Storage in production
@@ -133,6 +135,11 @@ REST_FRAMEWORK = {
     ]
 }
 
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(hours=1),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=7)
+}
+
 # Internationalization
 # https://docs.djangoproject.com/en/5.1/topics/i18n/
 
@@ -154,6 +161,17 @@ STATIC_ROOT = BASE_DIR / "staticfiles"
 MEDIA_URK = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
+CORS_ALLOW_CREDENTIALS = True
+CORS_ALLOW_ALL_ORIGINS = [
+    "http://localhost:5173",  # Your frontend URL
+    "https://g-league.vercel.app"
+]
+
+# CSRF_TRUSTED_ORIGINS = [
+#     "http://localhost:5173",  # Your frontend URL
+#     "https://g-league.vercel.app"
+# ]
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
@@ -162,13 +180,3 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 AUTH_USER_MODEL = 'team.User'
 
 
-CORS_ALLOW_CREDENTIALS = True
-CORS_ALLOWED_ORIGINS = [
-    "http://localhost:5173",  # Your frontend URL
-    "https://g-league.vercel.app"
-]
-
-CSRF_TRUSTED_ORIGINS = [
-    "http://localhost:5173",  # Your frontend URL
-    "https://g-league.vercel.app"
-]

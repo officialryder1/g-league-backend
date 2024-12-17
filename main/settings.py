@@ -162,11 +162,7 @@ MEDIA_URK = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 CORS_ALLOW_CREDENTIALS = True
-CORS_ALLOW_ALL_ORIGINS = [
-    "http://localhost:5173",  # Your frontend URL
-    "https://g-league.vercel.app"
-]
-
+CORS_ALLOW_ALL_ORIGINS = True
 # CSRF_TRUSTED_ORIGINS = [
 #     "http://localhost:5173",  # Your frontend URL
 #     "https://g-league.vercel.app"

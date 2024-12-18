@@ -1,7 +1,7 @@
 # from django.shortcuts import render, HttpResponse
 from django.http import JsonResponse
 from django.contrib.auth import get_user_model
-from .serializers import UserSerializer, PlayerSerializer, TeamSerializer
+from .serializers import UserSerializer, PlayerSerializer, TeamSerializer, CoachSerializer
 from rest_framework.response import Response
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework import generics, permissions, viewsets
@@ -90,20 +90,23 @@ class GenerateInviteLinkView(APIView):
 
     def post(self, request, team_id):
         try:
-            user_id = request.user.id
             team = Team.objects.get(id=team_id)
-            coach = Coach.objects.get(id=user_id)
-
-            # user = User.objects.get(id=user_id)
-            # Check if the user is a coach of the team
-            if not coach.team == request.user:
+            
+            # Ensure the logged-in user is a coach of the team
+            coach = Coach.objects.filter(name=request.user, team=team).first()
+            if not coach:
                 return Response({"error": "You are not the coach of this team"}, status=403)
             
             # Create invite link
+            invite = InviteLink.objects.create(
+                team=team, 
+                created_by=request.user, 
+                expires_at=now() + timedelta(days=5)
+            )
 
-            invite = InviteLink.objects.create(team=team, created_by=request.user, expires_at=now() + timedelta(days=5))
+            # invite_url = f"{request.build_absolute_uri('/api/invite/')}{invite.token}/"
 
-            invite_url = f"{request.build_absolute_uri('/api/invite/')}{invite.token}/"
+            invite_url = invite.token
             return Response({"invite_link": invite_url}, status=201)
         
         except Team.DoesNotExist:
@@ -171,3 +174,14 @@ def get_player_profile(request):
             'success': False,
             'error': 'Player profile not found.'
         }, status=404)
+    
+@api_view(['GET'])
+@permission_classes([permissions.IsAuthenticated])
+def get_coach_profile(request):
+    coach = get_object_or_404(Coach, name=request.user)
+    serializer = CoachSerializer(coach, context={'request': request})
+    return Response({
+        'success': True,
+        'data': serializer.data
+    }, status=200)
+   

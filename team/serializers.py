@@ -23,12 +23,12 @@ class TeamSerializer(serializers.HyperlinkedModelSerializer):
         fields = ['url', 'id',  'name', 'logo', 'abbr', 'bio', 'num_roaster']
 
 class PlayerSerializer(serializers.HyperlinkedModelSerializer):
-    name = serializers.PrimaryKeyRelatedField(queryset=User.objects.all())
+    name = serializers.CharField(source="name.username", read_only=True)
     team = TeamSerializer(read_only=True)
 
     class Meta:
         model = Player
-        fields = ['url', 'name', 'team', 'role', 'image', 'bio']
+        fields = ['url', 'id', 'name', 'team', 'role', 'image', 'bio']
         extra_kwargs = {
                 'url': {'view_name': 'player-detail', 'lookup_field': 'pk'},  
             }
@@ -41,3 +41,4 @@ class CoachSerializer(serializers.ModelSerializer):
         model = Coach
         fields = ['id', 'name', 'image', 'team', 'bio']
         
+       

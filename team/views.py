@@ -184,4 +184,19 @@ def get_coach_profile(request):
         'success': True,
         'data': serializer.data
     }, status=200)
-   
+
+@api_view(['GET'])
+def get_team_player(request, team_id):
+   try:
+        team = Team.objects.get(id=team_id)
+        players = Player.objects.filter(team=team)
+        serializer = PlayerSerializer(players, many=True, context={'request': request})
+        return Response({
+            'success': True,
+            'data': serializer.data
+        }, status=200)
+   except Team.DoesNotExist:
+       return Response({
+           'success': False,
+           'error': "Team not found"
+       }, status=404)

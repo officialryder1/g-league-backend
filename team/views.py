@@ -200,3 +200,25 @@ def get_team_player(request, team_id):
            'success': False,
            'error': "Team not found"
        }, status=404)
+   
+@api_view(['GET'])
+@permission_classes([permissions.AllowAny])
+def player_marketplace(request):
+    """
+    Get all users with role "player" who are not in the Player model.
+    """
+    registered_players = Player.objects.values_list('name_id', flat=True)
+    free_agents = User.objects.filter(role="player").exclude(id__in=registered_players)
+
+    if free_agents.exists():
+        serializer = UserSerializer(free_agents, many=True, context={'request': request})
+        return Response({
+            "success": True,
+            "data": serializer.data
+        }, status=200)
+    
+    return Response({
+        "success": False,
+        "message": "No free agents available"
+    }, status=404)
+    

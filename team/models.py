@@ -117,3 +117,30 @@ class InviteLink(models.Model):
 
     def __str__(self):
         return f"Invite link for {self.team.name} by {self.created_by.username}"
+    
+class Match(models.Model):
+    STATUS_CHOICES = [
+        ('pending', 'Pending'),
+        ('ongoing', 'Ongoing'),
+        ('completed', 'Completed'),
+        ('canceled', 'Canceled')
+    ]
+
+    team_a = models.ForeignKey(Team, related_name="matches_as_team_a", on_delete=models.CASCADE)
+    team_b = models.ForeignKey(Team, related_name="matches_as_team_b", on_delete=models.CASCADE)
+    date = models.DateTimeField()
+    status = models.CharField(
+        max_length=10, choices=STATUS_CHOICES, default="pending"
+    )
+    team_a_score = models.PositiveIntegerField(default=0)
+    team_b_score = models.PositiveIntegerField(default=0)
+    winner = models.ForeignKey(
+        Team, related_name="matches_won", on_delete=models.SET_NULL, null=True, blank=True
+    )
+    created_by = models.ForeignKey(
+        User, related_name="matches_created", on_delete=models.SET_NULL, null=True
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.team_a} vs {self.team_b} - {self.status}"

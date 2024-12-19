@@ -1,13 +1,13 @@
 # from django.shortcuts import render, HttpResponse
 from django.http import JsonResponse
 from django.contrib.auth import get_user_model
-from .serializers import UserSerializer, PlayerSerializer, TeamSerializer, CoachSerializer
+from .serializers import UserSerializer, PlayerSerializer, TeamSerializer, CoachSerializer, MatchSerializer
 from rest_framework.response import Response
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework import generics, permissions, viewsets
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
-from .models import Player, Team, Invitation, User, Coach, InviteLink
+from .models import Player, Team, Invitation, User, Coach, InviteLink, Match
 from django.utils.timezone import now, timedelta
 from django.shortcuts import get_object_or_404
 
@@ -221,4 +221,33 @@ def player_marketplace(request):
         "success": False,
         "message": "No free agents available"
     }, status=404)
-    
+
+
+# List and Create matches view
+class MatchListCreateView(generics.ListCreateAPIView):
+    queryset = Match.objects.all().order_by('-date')
+    serializer_class = MatchSerializer
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+
+    def perform_create(self, serializer):
+        serializer.save(created_by=self.request.user)
+
+
+# Retrieve, Update, and Delete Match Details
+class MatchDetailView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Match.objects.all()
+    serializer_class = MatchSerializer
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+
+
+# Get incoming matches
+@api_view(['GET'])
+@permission_classes([permissions.AllowAny])
+def upcoming_matches(request):
+    matches = Match.objects.filter(status="pending").order_by('date')
+    serializer = MatchSerializer(matches, many=True, context={"request": request})
+    return Response({
+        "success": True,
+        "data": serializer.data},
+        status=200
+    )

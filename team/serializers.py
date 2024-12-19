@@ -1,4 +1,4 @@
-from .models import Team, Player, Coach
+from .models import Team, Player, Coach, Match
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
 
@@ -41,4 +41,15 @@ class CoachSerializer(serializers.ModelSerializer):
         model = Coach
         fields = ['id', 'name', 'image', 'team', 'bio']
         
-       
+
+class MatchSerializer(serializers.ModelSerializer):
+    team_a = TeamSerializer(read_only=True)
+    team_b = TeamSerializer(read_only=True)
+    winner = TeamSerializer(read_only=True)
+
+    class Meta:
+        model = Match
+        fields = [
+            'id', 'team_a', 'team_b', 'date', 'status', 'team_a_score',
+            'team_b_score', 'winner', 'created_by', 'created_at'
+        ]

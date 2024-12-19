@@ -37,9 +37,18 @@ class Team(models.Model):
     bio = models.CharField(max_length=250)
     num_roaster = models.IntegerField(default=0)
     created_at = models.DateTimeField(auto_now_add=True)
+    wins = models.PositiveIntegerField(default=0)
+    loses = models.PositiveIntegerField(default=0)
+    points = models.PositiveIntegerField(default=0)
+    kills = models.PositiveIntegerField(default=0)
+    deaths = models.PositiveIntegerField(default=0)
 
     def __str__(self):
         return self.name
+    
+    @property
+    def kd_ratio(self):
+        return round(self.kills / self.deaths, 2) if self.deaths > 0 else 0
 
 
 class Player(models.Model):
@@ -144,3 +153,4 @@ class Match(models.Model):
 
     def __str__(self):
         return f"{self.team_a} vs {self.team_b} - {self.status}"
+

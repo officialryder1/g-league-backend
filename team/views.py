@@ -1,7 +1,7 @@
 # from django.shortcuts import render, HttpResponse
 from django.http import JsonResponse
 from django.contrib.auth import get_user_model
-from .serializers import UserSerializer, PlayerSerializer, TeamSerializer, CoachSerializer, MatchSerializer
+from .serializers import UserSerializer, PlayerSerializer, TeamSerializer, CoachSerializer, MatchSerializer, LeagueTableSerializer
 from rest_framework.response import Response
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework import generics, permissions, viewsets
@@ -251,3 +251,23 @@ def upcoming_matches(request):
         "data": serializer.data},
         status=200
     )
+@api_view(["GET"])
+@permission_classes([permissions.AllowAny])
+def match_played(request):
+    matches = Match.objects.filter(status="completed")
+    serializer = MatchSerializer(matches, many=True, context={'request':request})
+    return Response({
+        "success": True,
+        "data": serializer.data
+    }, status=200)
+
+@api_view(["GET"])
+@permission_classes([permissions.AllowAny])
+def league_table(request):
+    teams = Team.objects.all().order_by('-points', '-wins', '-loses')
+    serializer = LeagueTableSerializer(teams, many=True, context={'request': request})
+
+    return Response({
+        "success": True,
+        "data": serializer.data
+    }, status=200)

@@ -53,3 +53,10 @@ class MatchSerializer(serializers.ModelSerializer):
             'id', 'team_a', 'team_b', 'date', 'status', 'team_a_score',
             'team_b_score', 'winner', 'created_by', 'created_at'
         ]
+
+class LeagueTableSerializer(serializers.ModelSerializer):
+    kd_ratio = serializers.FloatField(read_only=True)
+
+    class Meta:
+        model = Team
+        fields = ['id', 'name', 'logo', 'wins', 'loses', 'points', 'kd_ratio']

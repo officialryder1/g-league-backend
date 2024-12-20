@@ -104,8 +104,7 @@ if set(sys.argv) & DEVELOPMENT_COMMANDS:
     }
 else:
     DATABASES = {
-        'default': dj_database_url.parse(config("POSTGRES"), conn_max_age=600,
-        ssl_require=True)
+        'default': dj_database_url.parse(config("POSTGRES"))
     }
 
 # Enable S3 Storage in production

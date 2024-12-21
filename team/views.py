@@ -11,6 +11,8 @@ from .models import Player, Team, Invitation, User, Coach, InviteLink, Match
 from django.utils.timezone import now, timedelta
 from django.shortcuts import get_object_or_404
 
+from cacheops import cached_as
+
 def route(request):
     data = {
         "message": "hello world",
@@ -50,6 +52,8 @@ class ProtectedView(APIView):
 class TeamView(viewsets.ModelViewSet):
     queryset = Team.objects.all().order_by('-created_at')
     serializer_class = TeamSerializer
+
+   
 
 class PlayerView(viewsets.ModelViewSet):
     queryset = Player.objects.all().order_by('-date_joined')
@@ -271,3 +275,4 @@ def league_table(request):
         "success": True,
         "data": serializer.data
     }, status=200)
+

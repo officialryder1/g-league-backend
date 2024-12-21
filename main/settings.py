@@ -139,6 +139,22 @@ SIMPLE_JWT = {
     'REFRESH_TOKEN_LIFETIME': timedelta(days=7)
 }
 
+
+# CACHES = {
+#     "default": {
+#         "BACKEND": "django_redis.cache.RedisCache",
+#         "LOCATION": "redis://127.0.0.1:6379/1",
+#         "OPTIONS": {
+#             "CLIENT_CLASS": "django_redis.client.DefaultClient",
+#         }
+#     }
+# }
+
+# CACHEOPS = {
+#     'team.*': {'ops': 'all', 'timeout': 60 * 15},  # Cache all operations on team models for 15 minutes
+# } 
+
+
 # Internationalization
 # https://docs.djangoproject.com/en/5.1/topics/i18n/
 

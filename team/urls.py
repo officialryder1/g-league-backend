@@ -1,5 +1,5 @@
 from django.urls import path, include
-from .views import route, RegisterView, ProtectedView, TeamView, PlayerView, create_invite, register_coach, GenerateInviteLinkView, accept_invite, get_current_user, get_player_profile, get_coach_profile,  get_team_player, player_marketplace, MatchDetailView, MatchListCreateView, upcoming_matches, match_played, league_table
+from .views import route, RegisterView, ProtectedView, TeamView, PlayerView, create_invite, register_coach, GenerateInviteLinkView, accept_invite, get_current_user, get_player_profile, get_coach_profile,  get_team_player, player_marketplace, MatchDetailView, MatchListCreateView, upcoming_matches, match_played, league_table, newsletter
 
 from rest_framework.routers import DefaultRouter
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView, TokenVerifyView
@@ -27,6 +27,9 @@ urlpatterns = [
     path('coach_profile/', get_coach_profile, name='coach_profile'),
     path('team_player/<int:team_id>/players/', get_team_player, name='player_team'),
     path('player-marketplace/', player_marketplace, name="player-marketplace"),
+
+    # Newsletter
+    path('newsletter/', newsletter, name='newsletter'),
 
     # Matches
     path('matches/all/', MatchListCreateView.as_view(), name='match-list-create'),

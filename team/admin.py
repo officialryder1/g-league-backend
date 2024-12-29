@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import User, Team, Player, Coach, Invitation, InviteLink, Match
+from .models import User, Team, Player, Coach, Invitation, InviteLink, Match, NewsLetter
 
 admin.site.register(User)
 
@@ -11,6 +11,7 @@ admin.site.register(Player)
 admin.site.register(Coach)
 admin.site.register(Invitation)
 admin.site.register(InviteLink)
+admin.site.register(NewsLetter)
 
 @admin.register(Match)
 class MatchAdmin(admin.ModelAdmin):

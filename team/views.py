@@ -7,7 +7,7 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework import generics, permissions, viewsets
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
-from .models import Player, Team, Invitation, User, Coach, InviteLink, Match
+from .models import Player, Team, Invitation, User, Coach, InviteLink, Match, NewsLetter
 from django.utils.timezone import now, timedelta
 from django.shortcuts import get_object_or_404
 
@@ -276,3 +276,10 @@ def league_table(request):
         "data": serializer.data
     }, status=200)
 
+@api_view(["POST"])
+def newsletter(request):
+    email = request.data.get("email")
+    if email:
+        NewsLetter.objects.create(email=email)
+        return Response({"success": "You have been subscribed to our newsletter"}, status=201)
+    return Response({"error": "Email is required"}, status=400)

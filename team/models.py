@@ -154,3 +154,10 @@ class Match(models.Model):
     def __str__(self):
         return f"{self.team_a} vs {self.team_b} - {self.status}"
 
+
+class NewsLetter(models.Model):
+    email = models.EmailField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.email

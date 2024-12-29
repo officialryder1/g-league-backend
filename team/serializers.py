@@ -1,4 +1,4 @@
-from .models import Team, Player, Coach, Match
+from .models import Team, Player, Coach, Match, NewsLetter
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
 
@@ -60,3 +60,8 @@ class LeagueTableSerializer(serializers.ModelSerializer):
     class Meta:
         model = Team
         fields = ['id', 'name', 'logo', 'wins', 'loses', 'points', 'kd_ratio']
+
+class NewsletterSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = NewsLetter
+        fields = ['id', 'email']

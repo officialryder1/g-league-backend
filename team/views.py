@@ -11,7 +11,6 @@ from .models import Player, Team, Invitation, User, Coach, InviteLink, Match, Ne
 from django.utils.timezone import now, timedelta
 from django.shortcuts import get_object_or_404
 
-from cacheops import cached_as
 
 def route(request):
     data = {
